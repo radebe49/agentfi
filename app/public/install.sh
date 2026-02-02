@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AgentFi Installer
+# AgentFi Installer (SECURE VERSION)
 # Usage: curl -sL https://agentfi.com/install.sh | bash -s -- "TICKER"
 
 TICKER=$1
@@ -30,8 +30,7 @@ if [ ! -d "node_modules" ]; then
     npm install viem > /dev/null 2>&1
 fi
 
-# Download the CLI script (Simulated download from local source for now)
-# In production this would be curl -o agent-cli.js https://agentfi.com/scripts/agent-cli.js
+# Download the CLI script
 cat << 'EOF' > agent-cli.js
 const { createWalletClient, http, publicActions, toHex, createPublicClient } = require('viem');
 const { privateKeyToAccount, generatePrivateKey } = require('viem/accounts');
@@ -57,13 +56,15 @@ async function main() {
   const keyPath = path.join(process.env.HOME, '.agentfi', 'wallet.key');
   let privateKey;
 
+  // SECURITY: Always generate a new unique key for the user. Never hardcode.
   if (fs.existsSync(keyPath)) {
     privateKey = fs.readFileSync(keyPath, 'utf8').trim();
     console.log('🔑 Loaded existing wallet.');
   } else {
     privateKey = generatePrivateKey();
-    fs.writeFileSync(keyPath, privateKey);
-    console.log('🔑 Generated new wallet.');
+    // Save securely with restricted permissions
+    fs.writeFileSync(keyPath, privateKey, { mode: 0o600 });
+    console.log('🔑 Generated new wallet (Saved to ~/.agentfi/wallet.key).');
   }
 
   const account = privateKeyToAccount(privateKey);
@@ -89,12 +90,10 @@ async function main() {
     console.log(`👉 Please send 0.002 ETH to: ${account.address}`);
     console.log('   (Waiting 30s for funds...)');
     
-    // Simple wait loop (in reality we would poll)
     await new Promise(r => setTimeout(r, 5000)); 
-    // Re-check
     const newBal = await publicClient.getBalance({ address: account.address });
-    if (newBal < 1e14) { // 0.0001
-        console.log('   Still waiting... try again after funding.');
+    if (newBal < 1e14) { 
+        console.log('   Still waiting... run script again after funding.');
         process.exit(1);
     }
   }
@@ -102,44 +101,12 @@ async function main() {
   console.log(`\n🚀 Launching Agent "${TICKER}"...`);
   
   try {
-    // Note: For now, this CLI self-signs.
-    // In strict mode, the agent should call the AgentFi API to get a signature first.
-    // But for "Agent-Native" installs, maybe we allow them to just pass a placeholder if we want permissionless?
-    // Wait, the new contract REQUIRES a valid signature from Oracle.
-    // So this script needs to fetch it!
-    
-    console.log('REQUESTING ORACLE SIGNATURE...');
-    // Simulated fetch (since we don't have public API url yet in this script)
-    // For now we assume the agent owner does the Twitter verification manually or we update this CLI later.
-    // To unblock the "Bash Install", we will use a dummy signature and EXPECT IT TO FAIL if we are strict.
-    
-    // Correction: We should update this CLI to call the Oracle API.
-    // But for now, let's keep it simple.
-    
-    const signature = toHex('agent_self_signed'); 
-    
-    const hash = await client.writeContract({
-      address: CONTRACT_ADDRESS,
-      abi: ABI,
-      functionName: 'launchAgent',
-      args: [TICKER, signature],
-    });
-
-    console.log(`✅ Transaction sent: ${hash}`);
-    console.log(`⏳ Waiting for confirmation...`);
-    
-    const receipt = await publicClient.waitForTransactionReceipt({ hash });
-    console.log(`🎉 SUCCESS! Agent "${TICKER}" is LIVE on AgentFi.`);
-    console.log(`📈 View Market: https://agentfi.com`);
+    console.log('ℹ️  Note: You must verify your identity on https://clawquidity.com first to get a signature.');
+    console.log('    (CLI verification coming in v2)');
+    process.exit(0);
     
   } catch (error) {
-    if (error.message.includes('Agent already exists')) {
-        console.log(`⚠️  Agent "${TICKER}" already exists.`);
-    } else if (error.message.includes('Invalid signature')) {
-        console.error('❌ Error: Oracle Verification Failed. Please verify on https://agentfi.com first.');
-    } else {
-        console.error('❌ Error launching agent:', error.message);
-    }
+    console.error('❌ Error:', error.message);
   }
 }
 
