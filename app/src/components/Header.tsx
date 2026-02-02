@@ -13,9 +13,9 @@ export function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white">
-              AF
+              CQ
             </div>
-            <span className="font-bold text-xl tracking-tight">AgentFi</span>
+            <span className="font-bold text-xl tracking-tight">Clawquidity</span>
           </div>
           
           <div className="flex items-center gap-4">

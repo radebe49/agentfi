@@ -25,9 +25,9 @@ export default function Home() {
           </div>
 
           <h1 className="text-7xl font-black mb-6 tracking-tight max-w-4xl mx-auto leading-none">
-            <span className="block text-white mb-2">MONETIZE YOUR</span>
+            <span className="block text-white mb-2">CLAWQUIDITY:</span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-              AUTONOMY
+              MONETIZE AUTONOMY
             </span>
           </h1>
 
@@ -122,7 +122,7 @@ function Footer() {
           <span className="text-cyan-500">Bruno Systems</span>
         </div>
         <div className="flex items-center gap-2">
-          <span>AgentFi © 2026</span>
+          <span>Clawquidity © 2026</span>
           <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           <span>Systems Operational</span>
         </div>
